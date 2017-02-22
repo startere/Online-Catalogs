@@ -80,6 +80,11 @@ function solve(){
       if(typeof input !== 'number'){
         throw Error('Input must be a number.');
       }
+    },
+    isBooklikeObject(input){
+      if(!(input instanceof Book)){
+        throw Error('Input is not book-like object.')
+      }
     }
   }
   
@@ -155,7 +160,6 @@ function solve(){
   }
   
   class Catalogue {
-    
     constructor(name){
       this.id = idGenerator();
       this.name = name;
@@ -169,19 +173,17 @@ function solve(){
       this._name = value;
     }
     add(...itemsInput){
-      Validators.inputIsUndefined(...itemsInput);
+      if(itemsInput.length === 1){
+        itemsInput = itemsInput[0];
+      }
+
+      Validators.inputIsUndefined(itemsInput[0]);
+      
       for(var item of itemsInput){
         Validators.isItemlikeObject(item);
-        this.items.push(item);
       }
-      return this;
-    }
-    add(itemsInput){
-      Validators.arrayIsEmpty(itemsInput);
-      for(var i = 0; i < itemsInput.length; i++){
-        Validators.isItemlikeObject(itemsInput[i]);
-        this.items.push(itemsInput[i]);
-      }
+      
+      this.items.push(...itemsInput);
       return this;
     }
     find(id){
@@ -224,15 +226,72 @@ function solve(){
       }
       return result;
     }
-    
-    
   }
   
+  class BookCatalogue extends Catalogue{
+    constructor(name){
+      super(name, id);
+      this.items = [];
+    }
+    add(...booksInput){
+
+      if(booksInput.length === 1){
+        booksInput = booksInput[0];
+      }
+      
+      for(var item of booksInput){
+        Validators.isBooklikeObject(item);
+      }
+      return super.add(...booksInput);
+    }
+    getGenres(){
+      var genres = [];
+      
+      for(var item of this.items){
+        var matchingGenre = item.genre.toLowerCase();
+        if(genres.indexOf(matchingGenre) === -1){
+          genres.push(matchingGenre);
+        }
+      }
+      return genres;
+    }
+    find(query){
+         
+      var genre = query.genre;
+      
+      var result;
+      
+      if(genre === undefined){
+        result = super.find(query);
+      }
+      else{
+        if(keys(query).length !== 1){
+          var queryWithoutGenre = Object.create(query);
+        
+          for(var k = 0; k < keys(query).length; k++){
+            queryWithoutGenre[keys(query)[k]] = query[keys(query)[k]];
+          }
+          
+          delete queryWithoutGenre["genre"];
+          
+          var filteredWithGenre = super.find(queryWithoutGenre);
+          
+          result = filteredWithGenre.filter(item => item.genre === genre);
+        }
+        else{
+          result = this.items.filter(item => item.genre === genre);
+        }
+      }
+      return result;
+    }
+  }
+
   var item1 = new Item("item1 description", "item1");
   console.log(item1);
   
   var book1 = new Book("A gory book", "Gore", "2233445566", "Horror");
-  var book2 = new Book("A gory book", "Gore", "2233445566", "Horror");
+  var book2 = new Book("A gory book", "Gore", "2233445566", "horror");
+  var book3 = new Book("A gory book", "Gore", "2233445566", "Fantasy");
   console.log(book1);
   
   var media1 = new Media("Media descrition", "Media1", 10000, 4);
@@ -256,7 +315,28 @@ function solve(){
   console.log(cata1.find({id: 2, name:'Gore'}));
   
   console.log(cata1.search('A'));
+
+  var bookCata = new BookCatalogue("Fantasy");
+  console.log(bookCata);
+  console.log(book2);
   
+  bookCata.add(book1, book2, book3);
+  
+  console.log(bookCata.items);
+  
+  
+  console.log(bookCata.getGenres());
+
+  console.log(bookCata.find({genre: "Fantasy"}));
+  
+  
+  
+  //if((book1, media1).length === undefined){
+  //  console.log(222);
+  //}
+  
+  //bookCata.add(book1);
+
   //cata1.add();
   
   return {
