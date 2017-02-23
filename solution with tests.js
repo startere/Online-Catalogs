@@ -1,4 +1,3 @@
-
 "use strict"
 
 function solve(){
@@ -367,6 +366,63 @@ function solve(){
       return result;
     }
   }
+
+  var item1 = new Item("item1 description", "item1");
+  console.log(item1);
+  
+  var book1 = new Book("A gory book", "Gore", "2233445566", "Horror");
+  var book2 = new Book("A gory book", "Gore", "2233445566", "horror");
+  var book3 = new Book("A gory book", "Gore", "2233445566", "Fantasy");
+  console.log(book1);
+  
+  var media1 = new Media("Media descrition", "Media1", 10001, 1);
+  var media2 = new Media("Media descrition", "Media2", 10004, 2);
+  var media3 = new Media("Media descrition", "Media3", 10001, 3);
+  var media4 = new Media("Media descrition", "Media4", 10002, 3);
+  console.log(media1);
+  
+  var cata1 = new Catalogue("Catalogue One");
+  console.log(cata1);
+  
+  cata1.add(book1, media1);
+  console.log(cata1.items);
+
+  cata1.add([book1, media1, book2]);
+  console.log(cata1.items);
+  
+
+  
+  console.log(cata1.find({id: 2, name:'Gore'}));
+  
+  console.log(cata1.search('A'));
+
+  var bookCata = new BookCatalogue("Fantasy");
+  console.log(bookCata);
+  console.log(book2);
+  
+  bookCata.add(book1, book2, book3);
+  
+  console.log(bookCata.items);
+  
+  
+  console.log(bookCata.getGenres());
+
+  console.log(bookCata.find({genre: "Fantasy"}));
+  
+  var mediaCata = new MediaCatalogue("MediaCatalogue");
+  
+  console.log(mediaCata);
+  
+  mediaCata.add(media1, media2, media3, media4);
+  
+  console.log(mediaCata.items);
+  
+  console.log(mediaCata.getTop(5));
+  
+  console.log(mediaCata.getSortedByDuration());
+  
+  console.log(mediaCata.find({id: 8, rating: 3}));
+  
 
   return {
     getBook: function (name, isbn, genre, description){
